@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "skills": [
+    {
+      "id": "music-player",
+      "displayName": "Music Player Skill",
+      "category": "audio",
+      "entry": "skills/music-player/run",
+      "inputSchema": {
+        "intent": "string",
+        "track": "string",
+        "playlist": "string[]"
+      },
+      "outputSchema": {
+        "status": "string",
+        "nowPlaying": "string",
+        "message": "string"
+      },
+      "boundAgents": [
+        "music-agent",
+        "utasama-main"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "image-generation",
+      "displayName": "Image Generation Skill",
+      "category": "visual",
+      "entry": "skills/image-generation/run",
+      "inputSchema": {
+        "assetType": "string",
+        "prompt": "string",
+        "negativePrompt": "string"
+      },
+      "outputSchema": {
+        "status": "string",
+        "assetPath": "string",
+        "previewUrl": "string"
+      },
+      "boundAgents": [
+        "image-agent",
+        "pet-agent"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "pet-animation",
+      "displayName": "Pet Animation Skill",
+      "category": "interaction",
+      "entry": "skills/pet-animation/run",
+      "inputSchema": {
+        "mood": "string",
+        "animationState": "string"
+      },
+      "outputSchema": {
+        "status": "string",
+        "effect": "string"
+      },
+      "boundAgents": [
+        "pet-agent"
+      ],
+      "status": "planned"
+    }
+  ]
+}
+

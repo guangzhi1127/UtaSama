@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UtaSama Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="uta-stage-frame" aria-hidden="true">
+      <div class="uta-headphone uta-headphone-left">
+        <span class="ear-band"></span>
+        <span class="ear-cup ear-cup-top"></span>
+        <span class="ear-cup ear-cup-bottom"></span>
+      </div>
+      <div class="uta-headphone uta-headphone-right">
+        <span class="ear-band"></span>
+        <span class="ear-cup ear-cup-top"></span>
+        <span class="ear-cup ear-cup-bottom"></span>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="nav-rail">
+        <div class="brand-block">
+          <span class="brand-kicker">Companion Agent</span>
+          <h1>UtaSama</h1>
+          <p>二次元美少女聊天助手原型</p>
+        </div>
+
+        <section class="persona-overview">
+          <img
+            class="persona-portrait"
+            src="./assets/uta-avatar.jpg"
+            alt="UtaSama portrait placeholder"
+          />
+          <div class="persona-copy">
+            <strong>歌咲 Uta</strong>
+            <span>主聊天 Agent / 占位人设</span>
+            <small>温柔、机灵、带一点舞台感</small>
+          </div>
+        </section>
+
+        <section class="scene-panel">
+          <div class="section-head">
+            <span>场景切换</span>
+          </div>
+          <div class="scene-switches" id="sceneSwitches"></div>
+        </section>
+
+        <section class="quick-panel">
+          <div class="section-head">
+            <span>快捷动作</span>
+          </div>
+          <div class="quick-actions">
+            <button class="icon-action" data-prefill="给我一组深夜氛围感歌单">
+              <span>音</span>
+              <small>歌单</small>
+            </button>
+            <button class="icon-action" data-prefill="帮我整理一份桌宠 Q 版出图需求">
+              <span>绘</span>
+              <small>出图</small>
+            </button>
+            <button class="icon-action" data-prefill="切换成桌宠互动模式">
+              <span>宠</span>
+              <small>桌宠</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="runtime-panel">
+          <div class="section-head">
+            <span>运行概况</span>
+          </div>
+          <ul class="runtime-list" id="runtimeSummary"></ul>
+        </section>
+      </aside>
+
+      <main class="conversation-panel">
+        <header class="conversation-header">
+          <div>
+            <span class="conversation-title">微信式聊天主界面</span>
+            <h2 id="activeAgentName">UtaSama Main Agent</h2>
+          </div>
+          <div class="status-strip">
+            <span class="status-pill status-live">在线</span>
+            <span class="status-pill" id="activeSceneName">日常陪伴</span>
+          </div>
+        </header>
+
+        <section class="agent-chips" id="agentChips"></section>
+
+        <section class="chat-feed" id="chatFeed" aria-live="polite"></section>
+
+        <footer class="composer">
+          <div class="composer-tools">
+            <button class="tool-button" data-prefill="帮我切到音乐子 Agent">
+              音乐
+            </button>
+            <button class="tool-button" data-prefill="帮我切到图像子 Agent">
+              绘图
+            </button>
+            <button class="tool-button" data-prefill="给我一个桌宠待机动作建议">
+              桌宠
+            </button>
+          </div>
+          <div class="composer-row">
+            <textarea
+              id="messageInput"
+              rows="1"
+              placeholder="和 UtaSama 说点什么，或者测试子 Agent / Skills / MCP 的扩展入口"
+            ></textarea>
+            <button id="sendButton" class="send-button">发送</button>
+          </div>
+        </footer>
+      </main>
+
+      <aside class="workspace-panel">
+        <div class="workspace-tabs">
+          <button class="workspace-tab is-active" data-view="agents">子 Agent</button>
+          <button class="workspace-tab" data-view="skills">Skills</button>
+          <button class="workspace-tab" data-view="mcp">MCP</button>
+          <button class="workspace-tab" data-view="export">导出</button>
+        </div>
+
+        <div class="workspace-view is-active" data-view="agents">
+          <div class="section-head">
+            <span>当前子 Agent</span>
+          </div>
+          <ul class="resource-list" id="agentRegistryList"></ul>
+          <form class="inline-form" id="agentForm">
+            <input type="text" name="name" placeholder="新增子 Agent 名称" required />
+            <input type="text" name="domain" placeholder="负责场景，例如 日程整理" required />
+            <button type="submit">添加</button>
+          </form>
+        </div>
+
+        <div class="workspace-view" data-view="skills">
+          <div class="section-head">
+            <span>可调用 Skills</span>
+          </div>
+          <ul class="resource-list" id="skillRegistryList"></ul>
+          <form class="inline-form" id="skillForm">
+            <input type="text" name="name" placeholder="新增 Skill 名称" required />
+            <input type="text" name="purpose" placeholder="用途，例如 播放 BGM" required />
+            <button type="submit">添加</button>
+          </form>
+        </div>
+
+        <div class="workspace-view" data-view="mcp">
+          <div class="section-head">
+            <span>预留 MCP 接口</span>
+          </div>
+          <ul class="resource-list" id="mcpRegistryList"></ul>
+          <form class="inline-form" id="mcpForm">
+            <input type="text" name="name" placeholder="新增 MCP 名称" required />
+            <input type="text" name="capability" placeholder="能力，例如 素材存储" required />
+            <button type="submit">添加</button>
+          </form>
+        </div>
+
+        <div class="workspace-view" data-view="export">
+          <div class="section-head">
+            <span>配置导出</span>
+          </div>
+          <p class="helper-copy">
+            当前页面里的自定义子 Agent、Skills、MCP 会先保存在本地浏览器存储中。
+          </p>
+          <button id="copyConfigButton" class="copy-button">复制当前注册表 JSON</button>
+          <pre class="export-preview" id="exportPreview"></pre>
+        </div>
+      </aside>
+    </div>
+
+    <div class="pet-dock" id="petDock">
+      <div class="pet-bubble" id="petBubble">我先在这里待机，随时接你话。</div>
+      <div class="pet-presence">
+        <button class="pet-button is-idle" id="petButton" type="button" aria-label="桌宠">
+          <img id="petImage" src="./assets/pet-states/idle.png" alt="UtaSama pet idle state" />
+        </button>
+        <div class="pet-status" id="petStatus">待机 · sunny</div>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

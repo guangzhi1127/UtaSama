@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "providers": [
+    {
+      "id": "music-library",
+      "displayName": "Local Music Library MCP",
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "servers/music-library/index.js"
+      ],
+      "env": {
+        "MUSIC_ROOT": "D:/Music"
+      },
+      "capabilities": [
+        "search-track",
+        "load-playlist",
+        "play-preview"
+      ],
+      "boundAgents": [
+        "music-agent",
+        "utasama-main"
+      ]
+    },
+    {
+      "id": "asset-storage",
+      "displayName": "Asset Storage MCP",
+      "transport": "http",
+      "command": "http://localhost:8787/mcp",
+      "args": [],
+      "env": {},
+      "capabilities": [
+        "save-asset",
+        "list-asset",
+        "version-asset"
+      ],
+      "boundAgents": [
+        "image-agent",
+        "pet-agent"
+      ]
+    }
+  ]
+}
+

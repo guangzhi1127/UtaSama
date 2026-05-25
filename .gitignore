@@ -1,0 +1,48 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environment variables and secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Local runtime memory and private chat data
+memory/chat_history.jsonl
+memory/session_summaries.json
+memory/memories.jsonl
+
+# Keep memory templates / lightweight profile files trackable unless they contain private data
+
+# Frontend dependencies and build outputs
+node_modules/
+frontend/node_modules/
+dist/
+build/
+frontend/dist/
+frontend/build/
+
+# Logs
+*.log
+logs/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Packaging outputs
+*.spec
+*.exe
+*.msi

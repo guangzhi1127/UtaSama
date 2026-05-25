@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "project": "UtaSama",
+  "entryAgent": "utasama-main",
+  "agents": [
+    {
+      "id": "utasama-main",
+      "displayName": "UtaSama Main Agent",
+      "type": "primary",
+      "personaPath": "../../character/uta-sama.persona.md",
+      "systemPromptPath": "../../character/prompts/main-agent.system.md",
+      "capabilities": [
+        "chat",
+        "persona-consistency",
+        "task-routing",
+        "response-merge"
+      ],
+      "delegatesTo": [
+        "music-agent",
+        "image-agent",
+        "pet-agent"
+      ],
+      "extensionPoints": [
+        "custom-agents",
+        "custom-skills",
+        "custom-mcp"
+      ]
+    },
+    {
+      "id": "music-agent",
+      "displayName": "Music Agent",
+      "type": "specialist",
+      "systemPromptPath": "../../character/prompts/music-agent.system.md",
+      "inputHints": [
+        "music",
+        "song",
+        "playlist",
+        "mood"
+      ],
+      "preferredSkills": [
+        "music-player"
+      ],
+      "preferredMcp": [
+        "music-library"
+      ]
+    },
+    {
+      "id": "image-agent",
+      "displayName": "Image Agent",
+      "type": "specialist",
+      "systemPromptPath": "../../character/prompts/image-agent.system.md",
+      "inputHints": [
+        "draw",
+        "image",
+        "avatar",
+        "pet",
+        "sticker"
+      ],
+      "preferredSkills": [
+        "image-generation"
+      ],
+      "preferredMcp": [
+        "asset-storage"
+      ]
+    },
+    {
+      "id": "pet-agent",
+      "displayName": "Pet Agent",
+      "type": "specialist",
+      "systemPromptPath": "../../character/prompts/pet-agent.system.md",
+      "inputHints": [
+        "pet",
+        "emotion",
+        "idle",
+        "interaction"
+      ],
+      "preferredSkills": [
+        "pet-animation"
+      ],
+      "preferredMcp": []
+    }
+  ]
+}
+
