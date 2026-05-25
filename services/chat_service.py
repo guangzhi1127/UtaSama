@@ -13,7 +13,7 @@ from services.memory_service import (
     update_session_summary_if_needed,
 )
 from services.pet_service import build_pet_state
-from services.rag_service import build_rag_context
+from services.rag_service import build_rag_payload
 from services.runtime_service import (
     build_agent_system_prompt,
     get_agent_display_name,
@@ -29,7 +29,8 @@ def build_model_messages(
 ) -> tuple[list[dict], dict]:
     system_prompt = build_agent_system_prompt(runtime_bundle["entry_agent"], runtime_bundle)
     specialist_route_context = build_specialist_route_context(route, runtime_bundle)
-    rag_context = build_rag_context(payload.message)
+    rag_payload = build_rag_payload(payload.message)
+    rag_context = rag_payload["context"]
     session_summary = get_session_summary(session_id)
     history_messages = build_history_messages(session_id)
     memory_recall_context = ""
@@ -84,6 +85,9 @@ def build_model_messages(
 
     debug_context = {
         "rag_context": rag_context,
+        "rag_mode": rag_payload["mode"],
+        "rag_matches": rag_payload["matches"],
+        "rag_error": rag_payload["error"],
         "session_summary": session_summary,
         "memory_recall_context": memory_recall_context,
         "history_messages": history_messages,
@@ -149,6 +153,9 @@ def chat_with_agent(payload: ChatRequest) -> dict:
         "preferred_skills": route["preferred_skills"],
         "preferred_mcp": route["preferred_mcp"],
         "rag_used": bool(debug_context["rag_context"]),
+        "rag_mode": debug_context["rag_mode"],
+        "rag_match_count": len(debug_context["rag_matches"]),
+        "rag_error": debug_context["rag_error"],
         "summary_used": bool(debug_context["session_summary"]),
         "memory_recall_used": bool(debug_context["memory_recall_context"]),
         "history_used": len(debug_context["history_messages"]),

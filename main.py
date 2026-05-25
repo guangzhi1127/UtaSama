@@ -1,10 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.settings import RECENT_HISTORY_LIMIT
+from core.settings import RAG_TOP_K, RECENT_HISTORY_LIMIT
 from schemas.chat import ChatRequest
 from services.chat_service import chat_with_agent
 from services.memory_service import bootstrap_memory_files, get_session_summary, load_chat_history
+from services.rag_service import (
+    get_rag_status,
+    rebuild_chunks,
+    rebuild_vector_index,
+    search_vector_index,
+)
 from services.runtime_service import build_runtime_config
 
 
@@ -41,6 +47,42 @@ def history(session_id: str, limit: int = RECENT_HISTORY_LIMIT):
         "recent_messages": full_history[-limit:] if limit > 0 else full_history,
         "summary": session_summary,
     }
+
+
+@app.get("/rag/status")
+def rag_status():
+    return get_rag_status()
+
+
+@app.post("/rag/chunks/rebuild")
+def rag_rebuild_chunks():
+    try:
+        return rebuild_chunks()
+    except Exception as error:
+        print("RAG chunk rebuild failed:", error)
+        raise HTTPException(status_code=500, detail=str(error))
+
+
+@app.post("/rag/vector/rebuild")
+def rag_rebuild_vector(force_rebuild_chunks: bool = True):
+    try:
+        return rebuild_vector_index(force_rebuild_chunks=force_rebuild_chunks)
+    except Exception as error:
+        print("RAG vector rebuild failed:", error)
+        raise HTTPException(status_code=500, detail=str(error))
+
+
+@app.get("/rag/search")
+def rag_search(query: str = Query(..., min_length=1), top_k: int = RAG_TOP_K):
+    try:
+        return {
+            "query": query,
+            "top_k": top_k,
+            "matches": search_vector_index(query, top_k=top_k),
+        }
+    except Exception as error:
+        print("RAG search failed:", error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 @app.post("/chat")

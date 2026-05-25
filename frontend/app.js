@@ -90,6 +90,9 @@ function createDefaultDebugState() {
     summaryUsed: false,
     memoryRecallUsed: false,
     ragUsed: false,
+    ragMode: "未检索",
+    ragMatchCount: 0,
+    ragError: "",
     matchedHints: [],
     preferredSkills: [],
     preferredMcp: [],
@@ -666,6 +669,7 @@ function renderRuntimeSummary() {
     ["摘要", formatBooleanFlag(state.debug.summaryUsed)],
     ["记忆召回", formatBooleanFlag(state.debug.memoryRecallUsed)],
     ["知识库", formatBooleanFlag(state.debug.ragUsed)],
+    ["RAG模式", `${state.debug.ragMode} / ${state.debug.ragMatchCount}`],
     ["建议 Skills", formatListValue(state.debug.preferredSkills)],
     ["建议 MCP", formatListValue(state.debug.preferredMcp)],
     ["桌宠", `${getPetManifest(state.pet.animationState).label} / ${state.pet.mood}`],
@@ -1076,6 +1080,9 @@ function updateDebugStateFromResponse(data) {
   state.debug.summaryUsed = Boolean(data.summary_used);
   state.debug.memoryRecallUsed = Boolean(data.memory_recall_used);
   state.debug.ragUsed = Boolean(data.rag_used);
+  state.debug.ragMode = data.rag_mode || "未知";
+  state.debug.ragMatchCount = Number.isFinite(data.rag_match_count) ? data.rag_match_count : 0;
+  state.debug.ragError = data.rag_error || "";
   state.debug.matchedHints = Array.isArray(data.matched_hints) ? data.matched_hints : [];
   state.debug.preferredSkills = Array.isArray(data.preferred_skills) ? data.preferred_skills : [];
   state.debug.preferredMcp = Array.isArray(data.preferred_mcp) ? data.preferred_mcp : [];

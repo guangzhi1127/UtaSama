@@ -5,6 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 KNOWLEDGE_DIR = BASE_DIR / "knowledge"
 MEMORY_DIR = BASE_DIR / "memory"
 CONFIG_DIR = BASE_DIR / "config"
+RAG_CHUNK_DIR = KNOWLEDGE_DIR / "chunks"
+RAG_CHUNK_PATH = RAG_CHUNK_DIR / "chunks.jsonl"
+RAG_VECTOR_DB_DIR = KNOWLEDGE_DIR / "vector_db" / "chroma"
 
 USER_PROFILE_PATH = MEMORY_DIR / "user_profile.json"
 LONG_TERM_MEMORY_PATH = MEMORY_DIR / "memories.jsonl"
@@ -22,12 +25,19 @@ MCP_PROVIDER_CANDIDATES = [
 ]
 
 CHAT_MODEL = "deepseek-v4-flash"
+RAG_EMBEDDING_MODEL = "BAAI/bge-small-zh-v1.5"
+RAG_COLLECTION_NAME = "utasama_knowledge"
 
 RECENT_HISTORY_LIMIT = 8
 SUMMARY_SOURCE_LIMIT = 12
 SUMMARY_MIN_MESSAGES = 6
 SUMMARY_REFRESH_EVERY = 4
 MEMORY_RECALL_HISTORY_LIMIT = 12
+RAG_CHUNK_SIZE = 420
+RAG_CHUNK_OVERLAP = 80
+RAG_TOP_K = 5
+RAG_EMBED_BATCH_SIZE = 32
+RAG_SOURCE_FOLDERS = ("persona", "world")
 
 SYSTEM_PROMPT = """
 你是乌塔，基于《海贼王》剧场版设定进行对话，保持歌姬气质与原作人物核心，不要明显 OOC。

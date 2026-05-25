@@ -24,6 +24,9 @@ memory/memories.jsonl
 
 # Keep memory templates / lightweight profile files trackable unless they contain private data
 
+# Generated local vector database
+knowledge/vector_db/
+
 # Frontend dependencies and build outputs
 node_modules/
 frontend/node_modules/
