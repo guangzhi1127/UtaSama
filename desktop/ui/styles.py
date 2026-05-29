@@ -1,6 +1,6 @@
 APP_STYLE = """
 QMainWindow {
-  background: #f5eef1;
+  background: transparent;
 }
 
 QWidget {
@@ -10,41 +10,39 @@ QWidget {
 }
 
 #RootFrame {
-  background: #fffafa;
-  border-left: 8px solid #d83a45;
-  border-right: 8px solid #f8f5f1;
-  border-top: 2px solid #d9ac52;
-  border-bottom: 2px solid #d9ac52;
+  background: transparent;
+  border: 0;
+  border-radius: 28px;
 }
 
 #TopBar {
-  background: rgba(255, 250, 250, 230);
+  background: rgba(255, 250, 250, 205);
   border: 1px solid #ead5c2;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 #ConversationPanel {
-  background: #f8e8ec;
+  background: rgba(248, 232, 236, 218);
   border: 1px solid #eccfd6;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 #ChatPanel {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 180);
   border: 1px solid #ead4d7;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 #ChatWallpaper {
   background: transparent;
   border: 1px solid #f0dcda;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 #RightPanel {
-  background: #fff8f3;
+  background: rgba(255, 248, 243, 218);
   border: 1px solid #ead4c3;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 #Title {
@@ -117,6 +115,33 @@ QPushButton:hover {
 
 QPushButton:disabled {
   background: #d8b9bd;
+}
+
+#WindowButton {
+  background: rgba(255, 255, 255, 185);
+  color: #7a5960;
+  border: 1px solid #e7c9cf;
+  border-radius: 9px;
+  padding: 0;
+  font-size: 16px;
+}
+
+#WindowButton:hover {
+  background: #fff8e7;
+  color: #8a6425;
+}
+
+#CloseButton {
+  background: rgba(216, 58, 69, 210);
+  color: #ffffff;
+  border: 0;
+  border-radius: 9px;
+  padding: 0;
+  font-size: 15px;
+}
+
+#CloseButton:hover {
+  background: #b92f3c;
 }
 
 QTextEdit {

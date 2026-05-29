@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1188" fill="none">
+  <defs>
+    <linearGradient id="leftHair" x1="216" y1="52" x2="560" y2="1092" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ee71a4"/>
+      <stop offset="0.5" stop-color="#c72858"/>
+      <stop offset="1" stop-color="#7d1236"/>
+    </linearGradient>
+    <linearGradient id="rightHair" x1="700" y1="32" x2="1112" y2="1098" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.58" stop-color="#eee8f6"/>
+      <stop offset="1" stop-color="#c9aed6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="62" y1="460" x2="1218" y2="806" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0a62e"/>
+      <stop offset="0.45" stop-color="#ffd96b"/>
+      <stop offset="1" stop-color="#b36a19"/>
+    </linearGradient>
+    <filter id="lineGlow" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fff0b0" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#2b1422" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#lineGlow)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer hair loops -->
+    <path
+      d="M307 255C240 168 201 60 229 -50C324 -58 401 7 424 95C441 162 420 219 381 273"
+      stroke="#37162e"
+      stroke-width="18"
+    />
+    <path
+      d="M307 255C240 168 201 60 229 -50C324 -58 401 7 424 95C441 162 420 219 381 273"
+      stroke="url(#leftHair)"
+      stroke-width="10"
+    />
+
+    <path
+      d="M888 270C917 203 916 132 956 70C1005 -7 1085 -38 1160 -13C1175 83 1131 176 1055 267"
+      stroke="#34293e"
+      stroke-width="18"
+    />
+    <path
+      d="M888 270C917 203 916 132 956 70C1005 -7 1085 -38 1160 -13C1175 83 1131 176 1055 267"
+      stroke="url(#rightHair)"
+      stroke-width="10"
+    />
+
+    <!-- Head and hair silhouette -->
+    <path
+      d="M308 535C288 447 283 361 317 288C364 188 461 115 640 108C817 114 914 188 963 289C1001 366 994 454 972 542"
+      stroke="#34212f"
+      stroke-width="20"
+    />
+    <path
+      d="M308 535C288 447 283 361 317 288C364 188 461 115 640 108"
+      stroke="url(#leftHair)"
+      stroke-width="12"
+    />
+    <path
+      d="M640 108C817 114 914 188 963 289C1001 366 994 454 972 542"
+      stroke="url(#rightHair)"
+      stroke-width="12"
+    />
+
+    <!-- Headphone silhouette as part of the single portrait outline -->
+    <path
+      d="M285 548C236 558 184 596 116 628C80 645 55 682 53 735C55 784 81 815 118 824C178 825 236 800 287 767"
+      stroke="#3b2a26"
+      stroke-width="18"
+    />
+    <path
+      d="M285 548C236 558 184 596 116 628C80 645 55 682 53 735C55 784 81 815 118 824C178 825 236 800 287 767"
+      stroke="url(#gold)"
+      stroke-width="10"
+    />
+    <path
+      d="M995 548C1044 558 1096 596 1164 628C1200 645 1225 682 1227 735C1225 784 1199 815 1162 824C1102 825 1044 800 993 767"
+      stroke="#3b2a26"
+      stroke-width="18"
+    />
+    <path
+      d="M995 548C1044 558 1096 596 1164 628C1200 645 1225 682 1227 735C1225 784 1199 815 1162 824C1102 825 1044 800 993 767"
+      stroke="url(#gold)"
+      stroke-width="10"
+    />
+
+    <!-- Face contour and lower portrait edge -->
+    <path
+      d="M310 720C326 851 433 964 549 1000C587 1012 620 1015 640 1015C660 1015 693 1012 731 1000C847 964 954 851 970 720"
+      stroke="#3b2b31"
+      stroke-width="16"
+    />
+    <path
+      d="M310 720C326 851 433 964 549 1000C587 1012 620 1015 640 1015C660 1015 693 1012 731 1000C847 964 954 851 970 720"
+      stroke="#fff2ec"
+      stroke-width="8"
+    />
+
+    <!-- Shoulders and collar as optional bottom contour -->
+    <path
+      d="M102 1184C126 1116 184 1062 260 1008C315 969 366 963 421 1015C464 1056 484 1114 491 1184"
+      stroke="#41343a"
+      stroke-width="16"
+    />
+    <path
+      d="M789 1184C796 1114 816 1056 859 1015C914 963 965 969 1020 1008C1096 1062 1154 1116 1178 1184"
+      stroke="#41343a"
+      stroke-width="16"
+    />
+    <path
+      d="M102 1184C126 1116 184 1062 260 1008C315 969 366 963 421 1015C464 1056 484 1114 491 1184"
+      stroke="#f8f8f6"
+      stroke-width="8"
+    />
+    <path
+      d="M789 1184C796 1114 816 1056 859 1015C914 963 965 969 1020 1008C1096 1062 1154 1116 1178 1184"
+      stroke="#f8f8f6"
+      stroke-width="8"
+    />
+
+    <!-- Hair split and bang hints, useful later as glow paths -->
+    <path d="M640 112C640 275 640 452 646 750" stroke="#3c2a37" stroke-width="8"/>
+    <path d="M640 112C640 275 640 452 646 750" stroke="#ffe4f0" stroke-width="3" opacity="0.82"/>
+    <path d="M338 316C386 333 435 354 493 377C451 430 424 489 406 590" stroke="#55142d" stroke-width="9"/>
+    <path d="M504 352C473 432 440 506 445 622" stroke="#55142d" stroke-width="8"/>
+    <path d="M890 334C846 376 817 417 786 478" stroke="#6b5a72" stroke-width="7"/>
+    <path d="M724 466C727 552 723 647 710 758" stroke="#6b5a72" stroke-width="7"/>
+    <path d="M782 546C779 627 767 698 750 775" stroke="#6b5a72" stroke-width="7"/>
+    <path d="M860 546C854 636 840 704 819 779" stroke="#6b5a72" stroke-width="7"/>
+  </g>
+</svg>

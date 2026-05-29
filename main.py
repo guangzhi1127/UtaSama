@@ -1,8 +1,11 @@
+from typing import Optional
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.settings import RAG_TOP_K, RECENT_HISTORY_LIMIT
 from schemas.chat import ChatRequest
+from schemas.music import MusicModeRequest, MusicPlayRequest
 from services.chat_service import chat_with_agent
 from services.memory_service import bootstrap_memory_files, get_session_summary, load_chat_history
 from services.rag_service import (
@@ -12,6 +15,7 @@ from services.rag_service import (
     search_vector_index,
 )
 from services.runtime_service import build_runtime_config
+from skills.music_player_skill import load_music_state, normalize_mode, run_music_skill
 
 
 bootstrap_memory_files()
@@ -83,6 +87,54 @@ def rag_search(query: str = Query(..., min_length=1), top_k: int = RAG_TOP_K):
     except Exception as error:
         print("RAG search failed:", error)
         raise HTTPException(status_code=500, detail=str(error))
+
+
+@app.get("/skills/music/state")
+def music_state():
+    return load_music_state()
+
+
+@app.post("/skills/music/play")
+def music_play(payload: Optional[MusicPlayRequest] = None):
+    payload = payload or MusicPlayRequest()
+    return run_music_skill(
+        "play_ado_playlist",
+        playlist_url=payload.playlist_url,
+        mode=payload.mode,
+        song_query=payload.song,
+        dry_run=payload.dry_run,
+    )
+
+
+@app.post("/skills/music/pause")
+def music_pause():
+    return run_music_skill("pause")
+
+
+@app.post("/skills/music/resume")
+def music_resume():
+    return run_music_skill("resume")
+
+
+@app.post("/skills/music/next")
+def music_next():
+    return run_music_skill("next")
+
+
+@app.post("/skills/music/previous")
+def music_previous():
+    return run_music_skill("previous")
+
+
+@app.post("/skills/music/stop")
+def music_stop():
+    return run_music_skill("stop")
+
+
+@app.post("/skills/music/mode")
+def music_mode(payload: MusicModeRequest):
+    action = "stage_mode" if normalize_mode(payload.mode) == "stage" else "background_mode"
+    return run_music_skill(action)
 
 
 @app.post("/chat")

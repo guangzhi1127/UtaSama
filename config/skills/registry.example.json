@@ -5,22 +5,26 @@
       "id": "music-player",
       "displayName": "Music Player Skill",
       "category": "audio",
-      "entry": "skills/music-player/run",
+      "entry": "skills.music_player_skill:run_music_skill",
       "inputSchema": {
-        "intent": "string",
-        "track": "string",
-        "playlist": "string[]"
+        "action": "play_ado_playlist | pause | resume | next | previous | stop | stage_mode | background_mode",
+        "playlist_url": "string",
+        "mode": "background | stage",
+        "song_query": "string",
+        "dry_run": "boolean"
       },
       "outputSchema": {
-        "status": "string",
-        "nowPlaying": "string",
-        "message": "string"
+        "ok": "boolean",
+        "action": "string",
+        "message": "string",
+        "state": "object",
+        "warnings": "string[]"
       },
       "boundAgents": [
         "music-agent",
         "utasama-main"
       ],
-      "status": "planned"
+      "status": "mvp"
     },
     {
       "id": "image-generation",
@@ -54,6 +58,9 @@
       },
       "outputSchema": {
         "status": "string",
+        "renderer": "gif | spine | live2d | static",
+        "assetId": "string",
+        "animationState": "string",
         "effect": "string"
       },
       "boundAgents": [
@@ -63,4 +70,3 @@
     }
   ]
 }
-

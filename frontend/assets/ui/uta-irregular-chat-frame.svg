@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" fill="none">
+  <defs>
+    <linearGradient id="hairRed" x1="82" y1="66" x2="754" y2="914" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8290"/>
+      <stop offset="0.45" stop-color="#df4359"/>
+      <stop offset="1" stop-color="#ba2c44"/>
+    </linearGradient>
+    <linearGradient id="hairWhite" x1="846" y1="62" x2="1518" y2="914" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="0.62" stop-color="#fff2e7"/>
+      <stop offset="1" stop-color="#edd8cf"/>
+    </linearGradient>
+    <linearGradient id="goldLine" x1="112" y1="24" x2="1482" y2="954" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe8a8"/>
+      <stop offset="0.52" stop-color="#d9ad45"/>
+      <stop offset="1" stop-color="#96702a"/>
+    </linearGradient>
+    <filter id="softGlow" x="-4%" y="-6%" width="108%" height="112%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#a53b53" flood-opacity="0.16"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ffe5a0" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softGlow)" stroke-linecap="round" stroke-linejoin="round">
+    <path
+      d="M103 58C179 20 290 54 389 42C514 27 619 14 747 38C789 46 829 47 873 39C1010 14 1145 25 1241 43C1356 64 1460 20 1515 74C1560 119 1510 215 1537 318C1564 422 1515 500 1538 610C1562 724 1518 851 1451 908C1375 973 1225 918 1091 940C981 958 895 944 799 931C703 945 616 958 506 940C371 918 225 971 148 908C76 849 39 728 63 614C86 503 37 423 63 319C89 214 43 118 103 58Z"
+      stroke="url(#goldLine)"
+      stroke-width="10"
+    />
+
+    <path
+      d="M116 82C203 42 308 82 408 68C524 52 640 54 779 75"
+      stroke="url(#hairRed)"
+      stroke-width="32"
+    />
+    <path
+      d="M109 91C72 168 123 236 102 326C77 432 98 524 80 626C61 735 105 835 172 882"
+      stroke="url(#hairRed)"
+      stroke-width="32"
+    />
+    <path
+      d="M176 883C273 927 396 889 514 909C608 925 689 922 779 905"
+      stroke="url(#hairRed)"
+      stroke-width="32"
+    />
+
+    <path
+      d="M821 75C960 54 1076 52 1192 68C1292 82 1397 42 1484 82"
+      stroke="url(#hairWhite)"
+      stroke-width="32"
+    />
+    <path
+      d="M1491 91C1528 168 1477 236 1498 326C1523 432 1502 524 1520 626C1539 735 1495 835 1428 882"
+      stroke="url(#hairWhite)"
+      stroke-width="32"
+    />
+    <path
+      d="M1424 883C1327 927 1204 889 1086 909C992 925 911 922 821 905"
+      stroke="url(#hairWhite)"
+      stroke-width="32"
+    />
+
+    <path
+      d="M151 87C252 41 388 70 516 55C626 42 719 45 799 64C879 45 973 42 1084 55C1212 70 1348 41 1449 87"
+      stroke="url(#goldLine)"
+      stroke-width="5"
+      opacity="0.96"
+    />
+    <path
+      d="M151 893C253 936 392 907 516 923C626 938 720 936 800 918C880 936 974 938 1084 923C1208 907 1347 936 1449 893"
+      stroke="url(#goldLine)"
+      stroke-width="5"
+      opacity="0.92"
+    />
+
+    <path
+      d="M274 55C247 113 249 169 292 222C231 211 190 170 166 105C196 82 229 65 274 55Z"
+      fill="#ea5368"
+      stroke="#ffd884"
+      stroke-width="3"
+      opacity="0.92"
+    />
+    <path
+      d="M437 42C419 100 429 154 476 201C413 198 371 163 348 101C373 75 402 56 437 42Z"
+      fill="#d73f57"
+      stroke="#ffd884"
+      stroke-width="3"
+      opacity="0.86"
+    />
+    <path
+      d="M1163 42C1181 100 1171 154 1124 201C1187 198 1229 163 1252 101C1227 75 1198 56 1163 42Z"
+      fill="#fff7ed"
+      stroke="#d7ad45"
+      stroke-width="3"
+      opacity="0.94"
+    />
+    <path
+      d="M1326 55C1353 113 1351 169 1308 222C1369 211 1410 170 1434 105C1404 82 1371 65 1326 55Z"
+      fill="#fff2e7"
+      stroke="#d7ad45"
+      stroke-width="3"
+      opacity="0.92"
+    />
+
+    <path d="M238 828C310 803 394 801 469 823" stroke="#ffd66d" stroke-width="6" opacity="0.76"/>
+    <path d="M1362 828C1290 803 1206 801 1131 823" stroke="#ffd66d" stroke-width="6" opacity="0.76"/>
+  </g>
+</svg>

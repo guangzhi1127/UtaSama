@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Any, Optional
 from uuid import uuid4
 
-from PySide6.QtCore import QEvent, Qt, QThreadPool, QTimer
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPixmap
+from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QThreadPool, QTimer
+from PySide6.QtGui import QColor, QLinearGradient, QMovie, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -29,9 +29,49 @@ FRONTEND_ASSET_DIR = PROJECT_ROOT / "frontend" / "assets"
 DESKTOP_ASSET_DIR = PROJECT_ROOT / "desktop" / "assets"
 AVATAR_PATH = FRONTEND_ASSET_DIR / "uta-avatar.jpg"
 PET_STATE_DIR = FRONTEND_ASSET_DIR / "pet-states"
-WALLPAPER_PATH = DESKTOP_ASSET_DIR / "wallpaper-placeholder.png"
-LEFT_HEADPHONE_PATH = DESKTOP_ASSET_DIR / "headphone-left.png"
-RIGHT_HEADPHONE_PATH = DESKTOP_ASSET_DIR / "headphone-right.png"
+PET_LIVE_PATH = PET_STATE_DIR / "uta-live.gif"
+PET_LIVE_ALT_PATH = PET_STATE_DIR / "uta-live-alt.gif"
+WALLPAPER_PATH = DESKTOP_ASSET_DIR / "wallpaper-uta-stage.jpg"
+FRAME_CONTENT_MARGINS = (22, 18, 22, 20)
+ASSISTANT_BUBBLE_MIN_WIDTH = 380
+ASSISTANT_BUBBLE_MAX_WIDTH = 660
+USER_BUBBLE_MIN_WIDTH = 150
+USER_BUBBLE_MAX_WIDTH = 600
+SYSTEM_BUBBLE_MAX_WIDTH = 680
+
+
+class StageRootFrame(QFrame):
+    def __init__(self, wallpaper_path: Path, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.wallpaper = QPixmap(str(wallpaper_path)) if wallpaper_path.exists() else QPixmap()
+        self.setObjectName("RootFrame")
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        path = QPainterPath()
+        path.addRoundedRect(self.rect(), 28, 28)
+        painter.setClipPath(path)
+
+        if not self.wallpaper.isNull():
+            scaled = self.wallpaper.scaled(
+                self.size(),
+                Qt.KeepAspectRatioByExpanding,
+                Qt.SmoothTransformation,
+            )
+            x = (self.width() - scaled.width()) // 2
+            y = (self.height() - scaled.height()) // 2
+            painter.drawPixmap(x, y, scaled)
+            painter.fillRect(self.rect(), QColor(255, 246, 248, 118))
+        else:
+            gradient = QLinearGradient(0, 0, self.width(), self.height())
+            gradient.setColorAt(0, QColor("#fff1f4"))
+            gradient.setColorAt(0.55, QColor("#fffaf6"))
+            gradient.setColorAt(1, QColor("#f5ece9"))
+            painter.fillRect(self.rect(), gradient)
+
+        painter.end()
 
 
 class WallpaperFrame(QFrame):
@@ -54,7 +94,7 @@ class WallpaperFrame(QFrame):
             x = (self.width() - scaled.width()) // 2
             y = (self.height() - scaled.height()) // 2
             painter.drawPixmap(x, y, scaled)
-            painter.fillRect(self.rect(), QColor(255, 250, 250, 174))
+            painter.fillRect(self.rect(), QColor(255, 250, 250, 146))
         else:
             gradient = QLinearGradient(0, 0, self.width(), self.height())
             gradient.setColorAt(0, QColor("#fff2f5"))
@@ -71,19 +111,25 @@ class ChatBubble(QFrame):
     def __init__(self, role: str, text: str, meta: str = "", parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self._bubble_label: Optional[QLabel] = None
+        self._bubble_role = role
+        self._bubble_target_width = 0
 
         outer = QHBoxLayout(self)
-        outer.setContentsMargins(10, 6, 10, 6)
-        outer.setSpacing(8)
+        outer.setContentsMargins(8, 6, 8, 6)
+        outer.setSpacing(9)
 
         if role == "system":
             outer.addStretch(1)
             bubble = QLabel(text)
             bubble.setWordWrap(True)
             bubble.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            bubble.setMaximumWidth(560)
+            bubble.setMaximumWidth(SYSTEM_BUBBLE_MAX_WIDTH)
+            bubble.setMinimumWidth(260)
             bubble.setAlignment(Qt.AlignCenter)
             bubble.setStyleSheet(SYSTEM_BUBBLE_STYLE)
+            self._bubble_label = bubble
+            self._bubble_target_width = self._target_bubble_width(text, "system")
             outer.addWidget(bubble)
             outer.addStretch(1)
             return
@@ -91,18 +137,28 @@ class ChatBubble(QFrame):
         bubble = QLabel(text)
         bubble.setWordWrap(True)
         bubble.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        bubble.setMaximumWidth(540)
-        bubble.setMinimumWidth(80)
+        bubble.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
 
         if role == "user":
+            bubble.setMaximumWidth(USER_BUBBLE_MAX_WIDTH)
+            bubble.setMinimumWidth(USER_BUBBLE_MIN_WIDTH)
             bubble.setStyleSheet(USER_BUBBLE_STYLE)
+            self._bubble_label = bubble
+            self._bubble_target_width = self._target_bubble_width(text, "user")
             outer.addStretch(1)
-            outer.addWidget(bubble)
-            outer.addWidget(self._build_user_avatar())
+            outer.addWidget(bubble, 0, Qt.AlignTop)
+            outer.addWidget(self._build_user_avatar(), 0, Qt.AlignTop)
             return
 
+        bubble.setMaximumWidth(ASSISTANT_BUBBLE_MAX_WIDTH)
+        bubble.setMinimumWidth(ASSISTANT_BUBBLE_MIN_WIDTH)
         bubble.setStyleSheet(ASSISTANT_BUBBLE_STYLE)
-        outer.addWidget(self._build_assistant_avatar())
+        self._bubble_label = bubble
+        self._bubble_target_width = self._target_bubble_width(text, "assistant")
+        avatar_slot = QWidget()
+        avatar_layout = QVBoxLayout(avatar_slot)
+        avatar_layout.setContentsMargins(0, 0, 0, 0)
+        avatar_layout.setSpacing(0)
         wrapper = QVBoxLayout()
         wrapper.setContentsMargins(0, 0, 0, 0)
         wrapper.setSpacing(3)
@@ -110,11 +166,50 @@ class ChatBubble(QFrame):
             meta_label = QLabel(meta)
             meta_label.setObjectName("Subtitle")
             wrapper.addWidget(meta_label)
+            avatar_layout.addSpacing(18)
+        avatar_layout.addWidget(self._build_assistant_avatar(), 0, Qt.AlignTop)
+        avatar_layout.addStretch(1)
         wrapper.addWidget(bubble)
         holder = QWidget()
         holder.setLayout(wrapper)
-        outer.addWidget(holder)
+        outer.addWidget(avatar_slot, 0, Qt.AlignTop)
+        outer.addWidget(holder, 0, Qt.AlignTop)
         outer.addStretch(1)
+
+    @staticmethod
+    def _target_bubble_width(text: str, role: str) -> int:
+        longest_line = max((len(line.strip()) for line in text.splitlines()), default=0)
+        text_len = max(longest_line, len(text.strip()))
+        if role == "assistant":
+            return min(ASSISTANT_BUBBLE_MAX_WIDTH, max(ASSISTANT_BUBBLE_MIN_WIDTH, text_len * 12 + 42))
+        if role == "user":
+            return min(USER_BUBBLE_MAX_WIDTH, max(USER_BUBBLE_MIN_WIDTH, text_len * 12 + 42))
+        return min(SYSTEM_BUBBLE_MAX_WIDTH, max(260, text_len * 10 + 42))
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._sync_bubble_width()
+
+    def _sync_bubble_width(self) -> None:
+        if self._bubble_label is None or self._bubble_target_width <= 0:
+            return
+
+        if self._bubble_role == "system":
+            min_width = 260
+            max_width = SYSTEM_BUBBLE_MAX_WIDTH
+            reserved_width = 72
+        elif self._bubble_role == "user":
+            min_width = USER_BUBBLE_MIN_WIDTH
+            max_width = USER_BUBBLE_MAX_WIDTH
+            reserved_width = 76
+        else:
+            min_width = ASSISTANT_BUBBLE_MIN_WIDTH
+            max_width = ASSISTANT_BUBBLE_MAX_WIDTH
+            reserved_width = 86
+
+        available_width = max(min_width, self.width() - reserved_width)
+        width = min(max_width, self._bubble_target_width, available_width)
+        self._bubble_label.setFixedWidth(width)
 
     @staticmethod
     def _build_assistant_avatar() -> QLabel:
@@ -145,30 +240,40 @@ class ChatBubble(QFrame):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, api_base_url: str = "http://127.0.0.1:8000"):
+    def __init__(
+        self,
+        api_base_url: str = "http://127.0.0.1:8000",
+        skip_initial_requests: bool = False,
+    ):
         super().__init__()
         self.api_client = UtaSamaApiClient(api_base_url)
         self.thread_pool = QThreadPool.globalInstance()
         self.session_id = f"desktop_{uuid4().hex[:12]}"
         self.is_waiting = False
         self.runtime_config: dict[str, Any] = {}
+        self.pet_movie: Optional[QMovie] = None
+        self.active_workers: list[ApiWorker] = []
+        self._drag_position: Optional[QPoint] = None
+        self._drag_targets: list[QWidget] = []
 
         self.setWindowTitle("UtaSama Desktop")
-        self.resize(1240, 780)
-        self.setMinimumSize(1040, 660)
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.resize(1420, 820)
+        self.setMinimumSize(1160, 720)
         self.setStyleSheet(APP_STYLE)
 
         self._build_ui()
         self._connect_events()
         self.add_message("assistant", "桌面客户端已经启动啦。现在像聊天框一样直接和我说话就好。", "UtaSama")
-        self.run_api_task("health")
-        self.run_api_task("runtime")
+        if not skip_initial_requests:
+            self.run_api_task("health")
+            self.run_api_task("runtime")
 
     def _build_ui(self) -> None:
-        self.root = QFrame()
-        self.root.setObjectName("RootFrame")
+        self.root = StageRootFrame(WALLPAPER_PATH)
         root_layout = QVBoxLayout(self.root)
-        root_layout.setContentsMargins(16, 14, 16, 14)
+        root_layout.setContentsMargins(*FRAME_CONTENT_MARGINS)
         root_layout.setSpacing(12)
 
         root_layout.addWidget(self._build_top_bar(), 0)
@@ -181,20 +286,26 @@ class MainWindow(QMainWindow):
         body.addWidget(self._build_right_panel(), 0)
         root_layout.addLayout(body, 1)
 
-        self._build_headphone_decorations()
         self.setCentralWidget(self.root)
+        self.root.installEventFilter(self)
+        self._drag_targets = [self.top_bar, self.title_label, self.subtitle_label]
+        for widget in self._drag_targets:
+            widget.installEventFilter(self)
 
     def _build_top_bar(self) -> QWidget:
         bar = QFrame()
         bar.setObjectName("TopBar")
+        self.top_bar = bar
         layout = QHBoxLayout(bar)
         layout.setContentsMargins(14, 9, 14, 9)
         layout.setSpacing(10)
 
         title = QLabel("UtaSama")
         title.setObjectName("Title")
+        self.title_label = title
         subtitle = QLabel("微信式本地 Agent 聊天客户端")
         subtitle.setObjectName("Subtitle")
+        self.subtitle_label = subtitle
 
         title_box = QVBoxLayout()
         title_box.setContentsMargins(0, 0, 0, 0)
@@ -207,6 +318,12 @@ class MainWindow(QMainWindow):
         self.agent_label.setObjectName("StatusPill")
         self.route_label = QLabel("路由：待机")
         self.route_label.setObjectName("StatusPill")
+        self.minimize_button = QPushButton("-")
+        self.close_button = QPushButton("x")
+        self.minimize_button.setObjectName("WindowButton")
+        self.close_button.setObjectName("CloseButton")
+        self.minimize_button.setFixedSize(32, 30)
+        self.close_button.setFixedSize(32, 30)
 
         self.reload_button = QPushButton("刷新配置")
         self.health_button = QPushButton("检查后端")
@@ -218,12 +335,14 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.route_label)
         layout.addWidget(self.reload_button)
         layout.addWidget(self.health_button)
+        layout.addWidget(self.minimize_button)
+        layout.addWidget(self.close_button)
         return bar
 
     def _build_conversation_panel(self) -> QWidget:
         panel = QFrame()
         panel.setObjectName("ConversationPanel")
-        panel.setFixedWidth(248)
+        panel.setFixedWidth(216)
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(10)
@@ -285,7 +404,7 @@ class MainWindow(QMainWindow):
         chat_header = QHBoxLayout()
         title = QLabel("UtaSama")
         title.setObjectName("SectionTitle")
-        hint = QLabel("背景壁纸位：desktop/assets/wallpaper-placeholder.png")
+        hint = QLabel("背景：desktop/assets/wallpaper-uta-stage.jpg")
         hint.setObjectName("Subtitle")
         chat_header.addWidget(title)
         chat_header.addStretch(1)
@@ -327,7 +446,7 @@ class MainWindow(QMainWindow):
     def _build_right_panel(self) -> QWidget:
         panel = QFrame()
         panel.setObjectName("RightPanel")
-        panel.setFixedWidth(282)
+        panel.setFixedWidth(246)
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(14, 14, 14, 14)
         layout.setSpacing(12)
@@ -373,42 +492,34 @@ class MainWindow(QMainWindow):
         self.update_pet_image("idle")
         return panel
 
-    def _build_headphone_decorations(self) -> None:
-        self.left_headphone = QLabel(self.root)
-        self.right_headphone = QLabel(self.root)
-        for label, path in (
-            (self.left_headphone, LEFT_HEADPHONE_PATH),
-            (self.right_headphone, RIGHT_HEADPHONE_PATH),
-        ):
-            label.setFixedSize(132, 132)
-            label.setAttribute(Qt.WA_TransparentForMouseEvents)
-            label.setStyleSheet("background: transparent;")
-            if path.exists():
-                label.setPixmap(
-                    QPixmap(str(path)).scaled(
-                        132,
-                        132,
-                        Qt.KeepAspectRatio,
-                        Qt.SmoothTransformation,
-                    )
-                )
-            label.raise_()
-
     def _connect_events(self) -> None:
         self.send_button.clicked.connect(self.submit_message)
         self.reload_button.clicked.connect(lambda: self.run_api_task("runtime"))
         self.health_button.clicked.connect(lambda: self.run_api_task("health"))
-
-    def resizeEvent(self, event) -> None:
-        super().resizeEvent(event)
-        if hasattr(self, "left_headphone"):
-            self.left_headphone.move(14, 48)
-            self.right_headphone.move(max(14, self.root.width() - 146), 48)
+        self.minimize_button.clicked.connect(self.showMinimized)
+        self.close_button.clicked.connect(self.close)
 
     def run_api_task(self, task: str, message: str = "") -> None:
         worker = ApiWorker(task, self.api_client, message=message, session_id=self.session_id)
-        worker.signals.finished.connect(self.handle_api_result)
+        self.active_workers.append(worker)
+        worker.signals.finished.connect(
+            lambda finished_task, result, active_worker=worker: self.handle_api_result_with_cleanup(
+                finished_task,
+                result,
+                active_worker,
+            )
+        )
         self.thread_pool.start(worker)
+
+    def handle_api_result_with_cleanup(
+        self,
+        task: str,
+        result: ApiResult,
+        worker: ApiWorker,
+    ) -> None:
+        if worker in self.active_workers:
+            self.active_workers.remove(worker)
+        self.handle_api_result(task, result)
 
     def submit_message(self) -> None:
         text = self.message_input.toPlainText().strip()
@@ -500,12 +611,24 @@ class MainWindow(QMainWindow):
                 error=data.get("rag_error") or "无",
             )
         )
-        self.skill_status.setText(
-            "Skills：{skills}\nMCP：{mcp}".format(
-                skills=self.format_list(data.get("preferred_skills")),
-                mcp=self.format_list(data.get("preferred_mcp")),
+        music_result = data.get("music_skill_result")
+        if isinstance(music_result, dict):
+            music_state = music_result.get("state") if isinstance(music_result.get("state"), dict) else {}
+            self.skill_status.setText(
+                "Skills: {skills}\nMCP: {mcp}\nMusic: {status} / {mode}".format(
+                    skills=self.format_list(data.get("preferred_skills")),
+                    mcp=self.format_list(data.get("preferred_mcp")),
+                    status=music_state.get("status", "unknown"),
+                    mode=music_state.get("mode", "background"),
+                )
             )
-        )
+        else:
+            self.skill_status.setText(
+                "Skills: {skills}\nMCP: {mcp}".format(
+                    skills=self.format_list(data.get("preferred_skills")),
+                    mcp=self.format_list(data.get("preferred_mcp")),
+                )
+            )
         self.update_pet_state(data.get("pet_state") or {})
 
     def update_pet_state(self, pet_state: dict[str, Any]) -> None:
@@ -517,11 +640,27 @@ class MainWindow(QMainWindow):
         self.update_pet_image(animation_state)
 
     def update_pet_image(self, animation_state: str) -> None:
+        gif_path = PET_LIVE_PATH if PET_LIVE_PATH.exists() else PET_LIVE_ALT_PATH
+        if gif_path.exists():
+            if self.pet_movie is not None:
+                self.pet_movie.stop()
+                self.pet_movie.deleteLater()
+
+            self.pet_movie = QMovie(str(gif_path))
+            self.pet_movie.setScaledSize(QSize(154, 134))
+            self.pet_image.setMovie(self.pet_movie)
+            self.pet_movie.start()
+            return
+
         image_path = PET_STATE_DIR / f"{animation_state}.png"
         if not image_path.exists():
             image_path = PET_STATE_DIR / "idle.png"
 
         if image_path.exists():
+            if self.pet_movie is not None:
+                self.pet_movie.stop()
+                self.pet_movie.deleteLater()
+                self.pet_movie = None
             pixmap = QPixmap(str(image_path)).scaled(
                 154,
                 154,
@@ -545,6 +684,38 @@ class MainWindow(QMainWindow):
         super().keyPressEvent(event)
 
     def eventFilter(self, watched, event) -> bool:
+        if watched is self.root:
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+                self._drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+                event.accept()
+                return True
+            if (
+                event.type() == QEvent.MouseMove
+                and self._drag_position is not None
+                and event.buttons() & Qt.LeftButton
+            ):
+                self.move(event.globalPosition().toPoint() - self._drag_position)
+                event.accept()
+                return True
+            if event.type() == QEvent.MouseButtonRelease:
+                self._drag_position = None
+
+        if watched in getattr(self, "_drag_targets", []):
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+                self._drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+                event.accept()
+                return True
+            if (
+                event.type() == QEvent.MouseMove
+                and self._drag_position is not None
+                and event.buttons() & Qt.LeftButton
+            ):
+                self.move(event.globalPosition().toPoint() - self._drag_position)
+                event.accept()
+                return True
+            if event.type() == QEvent.MouseButtonRelease:
+                self._drag_position = None
+
         if watched is self.message_input and event.type() == QEvent.KeyPress:
             if event.key() in {Qt.Key_Return, Qt.Key_Enter} and event.modifiers() & Qt.ControlModifier:
                 self.submit_message()

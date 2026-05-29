@@ -25,6 +25,7 @@ class ApiWorker(QRunnable):
         self.message = message
         self.session_id = session_id
         self.signals = WorkerSignals()
+        self.setAutoDelete(False)
 
     @Slot()
     def run(self) -> None:

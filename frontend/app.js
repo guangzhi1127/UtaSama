@@ -118,33 +118,35 @@ const petMoodFallbackAnimation = {
   protective: "alert"
 };
 
+const petLiveAsset = "./assets/pet-states/uta-live.gif";
+
 const petStateManifest = {
   idle: {
-    src: "./assets/pet-states/idle.png",
+    src: petLiveAsset,
     label: "待机",
     buttonClass: "is-idle",
     moodFallback: "sunny"
   },
   happy: {
-    src: "./assets/pet-states/happy.png",
+    src: petLiveAsset,
     label: "开心",
     buttonClass: "is-happy",
     moodFallback: "sunny"
   },
   think: {
-    src: "./assets/pet-states/think.png",
+    src: petLiveAsset,
     label: "思考",
     buttonClass: "is-think",
     moodFallback: "serious"
   },
   sing: {
-    src: "./assets/pet-states/sing.png",
+    src: petLiveAsset,
     label: "唱歌",
     buttonClass: "is-sing",
     moodFallback: "idol"
   },
   alert: {
-    src: "./assets/pet-states/alert.png",
+    src: petLiveAsset,
     label: "提醒",
     buttonClass: "is-alert",
     moodFallback: "protective"

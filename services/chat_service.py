@@ -19,6 +19,7 @@ from services.runtime_service import (
     get_agent_display_name,
     load_runtime_bundle,
 )
+from skills.music_player_skill import handle_music_message, should_handle_music_message
 
 
 def build_model_messages(
@@ -101,6 +102,63 @@ def chat_with_agent(payload: ChatRequest) -> dict:
     route = detect_route(payload.message, runtime_bundle)
     active_agent_id = route["active_agent"]
     agent_display_name = get_agent_display_name(active_agent_id, runtime_bundle)
+
+    if should_handle_music_message(payload.message, route):
+        if active_agent_id != "music-agent":
+            active_agent_id = "music-agent"
+            route["active_agent"] = active_agent_id
+            route["preferred_skills"] = ["music-player"]
+            route["preferred_mcp"] = ["music-library"]
+            route["route_reason"] = "命中音乐播放指令，交给 Music Agent 调用 music-player skill。"
+        agent_display_name = get_agent_display_name(active_agent_id, runtime_bundle)
+        append_chat_message(
+            session_id,
+            "user",
+            payload.message,
+            agent_id=active_agent_id,
+            intent=route["intent"],
+        )
+        music_skill_result = handle_music_message(payload.message, route)
+        reply_text = music_skill_result["reply_text"]
+
+        append_chat_message(
+            session_id,
+            "assistant",
+            reply_text,
+            agent_id=active_agent_id,
+            intent=route["intent"],
+        )
+
+        pet_state = build_pet_state(payload.message, reply_text, route)
+        return {
+            "session_id": session_id,
+            "reply_text": reply_text,
+            "pet_state": pet_state,
+            "pet_mood": pet_state["mood"],
+            "pet_line": pet_state["voiceLine"],
+            "entry_agent": runtime_bundle["entry_agent"],
+            "active_agent": active_agent_id,
+            "agent_display_name": agent_display_name,
+            "intent": route["intent"],
+            "route_reason": route["route_reason"],
+            "matched_hints": route["matched_hints"],
+            "preferred_skills": route["preferred_skills"],
+            "preferred_mcp": route["preferred_mcp"],
+            "skill_used": "music-player",
+            "music_skill_result": music_skill_result,
+            "music_state": music_skill_result.get("state", {}),
+            "rag_used": False,
+            "rag_mode": "skill-direct",
+            "rag_match_count": 0,
+            "rag_error": "",
+            "summary_used": False,
+            "memory_recall_used": False,
+            "history_used": 0,
+            "history_message_count": len(load_chat_history(session_id)),
+            "rag_preview": "",
+            "summary_preview": get_session_summary(session_id)[:300],
+        }
+
     messages, debug_context = build_model_messages(payload, session_id, runtime_bundle, route)
 
     append_chat_message(

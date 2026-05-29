@@ -19,6 +19,8 @@ def build_pet_state(user_message: str, reply_text: str, route: dict) -> dict:
             "voiceLine": voice_line,
             "gesture": gesture,
             "followUpHint": follow_up_hint,
+            "renderer": "gif",
+            "assetId": "uta-live",
         }
 
     if contains_any(text, COMFORT_KEYWORDS):

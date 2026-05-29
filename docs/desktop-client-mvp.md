@@ -12,7 +12,7 @@ PySide6 桌面窗口
   -> RAG / Memory / Agent / DeepSeek
 ```
 
-这一版还不是 exe，也不会自动启动后端。先分开运行，方便初学阶段调试。
+这一版还不是 exe，但已经支持通过 `launcher.py` 一键启动本地后端和桌面客户端。
 
 ## 新增文件
 
@@ -28,6 +28,7 @@ desktop/
 
 职责说明：
 
+- `launcher.py`：一键启动入口，负责启动后端、等待 `/health`、打开桌面客户端、关闭时收尾。
 - `desktop/app.py`：桌面客户端启动入口。
 - `desktop/api_client.py`：封装对 FastAPI 的 HTTP 请求。
 - `desktop/worker.py`：后台线程执行请求，避免 UI 卡住。
@@ -55,32 +56,70 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 python -m pip install -r requirements.txt
 ```
 
-### 3. 启动后端
+### 3. 推荐：一键启动
 
-在第一个终端运行：
+在项目根目录运行：
+
+```powershell
+python launcher.py
+```
+
+它会自动完成：
+
+```text
+检测 http://127.0.0.1:8000/health
+  -> 如果后端已在线，直接打开桌面客户端
+  -> 如果后端未在线，启动 uvicorn main:app
+  -> 等待 /health 返回 ok
+  -> 打开 PySide6 桌面客户端
+  -> 客户端关闭后，关闭由 launcher 启动的后端
+```
+
+启动器日志在：
+
+```text
+logs/launcher-backend.log
+```
+
+### 4. 可选：分开启动，适合调试
+
+第一个终端运行：
 
 ```powershell
 fastapi dev main.py
 ```
 
-确认后端地址：
-
-```text
-http://127.0.0.1:8000
-```
-
-### 4. 启动桌面客户端
-
-另开第二个终端，在项目根目录运行：
+第二个终端运行：
 
 ```powershell
 python -m desktop.app
 ```
 
-也可以运行：
+如果后端端口不是默认的 `8000`，可以指定：
 
 ```powershell
-python desktop/app.py
+python -m desktop.app --api-base-url http://127.0.0.1:8010
+```
+
+### 5. 启动器参数
+
+```powershell
+python launcher.py --host 127.0.0.1 --port 8000
+```
+
+常用参数：
+
+```text
+--port 8010      使用其他后端端口
+--no-backend     不自动启动后端，只打开客户端并连接已有后端
+--timeout 60     等待后端启动的最长秒数
+--smoke          快速启动并自动退出，用于测试
+```
+
+默认后端地址：
+
+```text
+http://127.0.0.1:8000
 ```
 
 ## 当前 UI 结构
@@ -124,6 +163,15 @@ desktop/assets/headphone-right.png
 - `wallpaper-placeholder.png`：聊天区背景壁纸，建议 1400x900 或更大。
 - `headphone-left.png`：左侧透明背景金色耳机。
 - `headphone-right.png`：右侧透明背景金色耳机。
+
+当前桌宠临时使用 GIF 动图：
+
+```text
+frontend/assets/pet-states/uta-live.gif
+frontend/assets/pet-states/uta-live-alt.gif
+```
+
+Web 前端直接用 `<img>` 播放 GIF，桌面端用 `QMovie` 播放 GIF。后续可以逐步替换成多状态 GIF、Spine 或 Live2D。
 
 ## 当前 UI 功能
 

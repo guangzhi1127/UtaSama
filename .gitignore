@@ -21,6 +21,7 @@ __pycache__/
 memory/chat_history.jsonl
 memory/session_summaries.json
 memory/memories.jsonl
+memory/music_player_state.json
 
 # Keep memory templates / lightweight profile files trackable unless they contain private data
 
